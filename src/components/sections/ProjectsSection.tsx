@@ -86,24 +86,26 @@ export const ProjectsSection = () => {
     },
     {
       id: 5,
-      title: "Follow Cart FYP",
-      category: "IoT & Computer Vision",
-      description: "A hybrid obstacle avoidance cart using Ultrasonic + OpenCV.",
-      longDescription:
-        "Uses ultrasonic sensors for real-time distance measurement and OpenCV-based vision for obstacle detection. Hybrid navigation for reliability.",
-      tech: ["ESP32", "Arduino", "OpenCV", "Python"],
-      media: [
-        { type: "image", src: "/assets/cart1.jpg" },
-        { type: "image", src: "/assets/cart2.png" },
-        { type: "video", src: "/assets/cart3.mp4" },
-      ],
-      status: "In Progress",
-      year: "2025",
-      features: [
-        "Ultrasonic obstacle detection",
-        "OpenCV-based camera vision",
-        "Hybrid decision system",
-      ],
+title: "Follow Cart FYP",
+category: "IoT & Computer Vision",
+description: "A hybrid obstacle avoidance cart using Ultrasonic + OpenCV.",
+longDescription:
+  "Uses ultrasonic sensors for real-time distance measurement and OpenCV-based vision for obstacle detection. Hybrid navigation for reliability. The project was successfully completed and recognized by iCreativez Karachi, awarding a 10,000 PKR cash prize.",
+tech: ["ESP32", "Arduino", "OpenCV", "Python"],
+media: [
+  { type: "image", src: "/assets/cart1.jpg" },
+  { type: "image", src: "/assets/cart2.png" },
+  { type: "video", src: "/assets/cart3.mp4" },
+],
+status: "Completed",
+year: "2025",
+features: [
+  "Ultrasonic obstacle detection",
+  "OpenCV-based camera vision",
+  "Hybrid decision system",
+  "Awarded 10,000 PKR cash prize by iCreativez Karachi",
+],
+
     },
     {
       id: 6,

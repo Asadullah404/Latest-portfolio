@@ -1,52 +1,59 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, Palette, Settings } from 'lucide-react';
+import { Moon, Palette, Settings, MousePointer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-type Theme = 'light' | 'dark' | 'cosmic';
+type Theme = 'dark' | 'cosmic';
 
 export const ThemeSwitcher = () => {
   const [theme, setTheme] = useState<Theme>('dark');
   const [isOpen, setIsOpen] = useState(false);
   const [timeBasedTheme, setTimeBasedTheme] = useState<Theme>('dark');
+  const [cursorEnabled, setCursorEnabled] = useState(true);
 
   useEffect(() => {
-    // Load saved theme or detect system preference
+    // Load saved theme
     const savedTheme = localStorage.getItem('portfolio-theme') as Theme;
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else {
-      setTheme(systemPrefersDark ? 'dark' : 'light');
+    if (savedTheme) setTheme(savedTheme);
+
+    // Load cursor state
+    const savedCursor = localStorage.getItem('portfolio-cursor');
+    if (savedCursor !== null) {
+      setCursorEnabled(savedCursor === 'true');
     }
 
-    // Set up time-based theme suggestions
+    // Time-based theme
     const updateTimeBasedTheme = () => {
       const hour = new Date().getHours();
-      if (hour >= 6 && hour < 18) {
-        setTimeBasedTheme('light'); // Daytime
-      } else if (hour >= 18 && hour < 22) {
+      if (hour >= 18 && hour < 22) {
         setTimeBasedTheme('cosmic'); // Evening
       } else {
-        setTimeBasedTheme('dark'); // Night
+        setTimeBasedTheme('dark'); // Default Night
       }
     };
 
     updateTimeBasedTheme();
-    const interval = setInterval(updateTimeBasedTheme, 60000); // Update every minute
-
+    const interval = setInterval(updateTimeBasedTheme, 60000);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    // Apply theme to document
+    // Apply theme
     document.documentElement.className = theme;
     localStorage.setItem('portfolio-theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    // Apply cursor toggle
+    if (cursorEnabled) {
+      document.body.classList.remove('cursor-off');
+    } else {
+      document.body.classList.add('cursor-off');
+    }
+    localStorage.setItem('portfolio-cursor', String(cursorEnabled));
+  }, [cursorEnabled]);
+
   const themes = [
-    { id: 'light' as Theme, name: 'Light', icon: Sun, color: 'hsl(260, 90%, 60%)' },
     { id: 'dark' as Theme, name: 'Dark', icon: Moon, color: 'hsl(260, 90%, 70%)' },
     { id: 'cosmic' as Theme, name: 'Cosmic', icon: Palette, color: 'hsl(280, 90%, 75%)' },
   ];
@@ -61,10 +68,7 @@ export const ThemeSwitcher = () => {
         animate={isOpen ? "open" : "closed"}
       >
         {/* Main toggle button */}
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Button
             variant="outline"
             size="icon"
@@ -80,7 +84,7 @@ export const ThemeSwitcher = () => {
           </Button>
         </motion.div>
 
-        {/* Theme options panel */}
+        {/* Panel */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -88,11 +92,12 @@ export const ThemeSwitcher = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 10 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-16 right-0 glass rounded-2xl p-4 min-w-[200px] shadow-cosmic border border-primary/20"
+              className="absolute top-16 right-0 glass rounded-2xl p-4 min-w-[220px] shadow-cosmic border border-primary/20"
             >
               <div className="space-y-2">
-                <h3 className="text-sm font-semibold gradient-text mb-3">Choose Theme</h3>
+                <h3 className="text-sm font-semibold gradient-text mb-3">Settings</h3>
                 
+                {/* Theme Options */}
                 {themes.map((themeOption) => {
                   const Icon = themeOption.icon;
                   const isActive = theme === themeOption.id;
@@ -136,12 +141,27 @@ export const ThemeSwitcher = () => {
                     </motion.button>
                   );
                 })}
-                
-                <div className="pt-2 mt-3 border-t border-border/50">
-                  <p className="text-xs text-muted-foreground">
-                    Theme adapts to time of day automatically
-                  </p>
-                </div>
+
+                {/* Cursor Toggle */}
+                <motion.button
+                  onClick={() => setCursorEnabled(!cursorEnabled)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group ${
+                    cursorEnabled 
+                      ? 'bg-primary/20 border border-primary/40' 
+                      : 'hover:bg-secondary/50 border border-transparent'
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className={`p-2 rounded-lg ${cursorEnabled ? 'bg-primary/30' : 'bg-secondary/30'}`}>
+                    <MousePointer className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className={`font-medium ${cursorEnabled ? 'text-primary' : 'text-foreground'}`}>
+                      {cursorEnabled ? 'Custom Cursor: On' : 'Custom Cursor: Off'}
+                    </div>
+                  </div>
+                </motion.button>
               </div>
             </motion.div>
           )}

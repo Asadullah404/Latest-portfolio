@@ -1,19 +1,53 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export const CustomCursor = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [haloPosition, setHaloPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
-  const [cursorType, setCursorType] = useState('default');
+  const [cursorType, setCursorType] = useState("default");
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Sync with ThemeSwitcher toggle
+    const savedCursor = localStorage.getItem("portfolio-cursor");
+    if (savedCursor !== null) {
+      setEnabled(savedCursor === "true");
+    }
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "portfolio-cursor") {
+        setEnabled(e.newValue === "true");
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      setEnabled(false);
+      return;
+    }
+
     const updateMousePosition = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
+    const updateTouchPosition = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        setMousePosition({
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+        });
+      }
+    };
+
     const updateHaloPosition = () => {
-      setHaloPosition(prev => ({
+      setHaloPosition((prev) => ({
         x: prev.x + (mousePosition.x - prev.x) * 0.1,
         y: prev.y + (mousePosition.y - prev.y) * 0.1,
       }));
@@ -21,66 +55,66 @@ export const CustomCursor = () => {
 
     const handleMouseEnter = (e: Event) => {
       const target = e.target as HTMLElement;
-      if (target.matches('a, button, [role="button"], .interactive')) {
+      if (target.matches("a, button, [role='button'], .interactive")) {
         setIsHovering(true);
-        setCursorType('hover');
-      } else if (target.matches('.project-card, .skill-card')) {
+        setCursorType("hover");
+      } else if (target.matches(".project-card, .skill-card")) {
         setIsHovering(true);
-        setCursorType('card');
-      } else if (target.matches('h1, h2, h3')) {
-        setCursorType('text');
+        setCursorType("card");
+      } else if (target.matches("h1, h2, h3")) {
+        setCursorType("text");
       }
     };
 
     const handleMouseLeave = () => {
       setIsHovering(false);
-      setCursorType('default');
+      setCursorType("default");
     };
 
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
-    if (prefersReducedMotion || isMobile) {
-      return;
-    }
-
-    window.addEventListener('mousemove', updateMousePosition);
-    document.addEventListener('mouseenter', handleMouseEnter, true);
-    document.addEventListener('mouseleave', handleMouseLeave, true);
+    // Listeners
+    window.addEventListener("mousemove", updateMousePosition);
+    window.addEventListener("touchmove", updateTouchPosition);
+    document.addEventListener("mouseenter", handleMouseEnter, true);
+    document.addEventListener("mouseleave", handleMouseLeave, true);
 
     const haloInterval = setInterval(updateHaloPosition, 16);
 
     return () => {
-      window.removeEventListener('mousemove', updateMousePosition);
-      document.removeEventListener('mouseenter', handleMouseEnter, true);
-      document.removeEventListener('mouseleave', handleMouseLeave, true);
+      window.removeEventListener("mousemove", updateMousePosition);
+      window.removeEventListener("touchmove", updateTouchPosition);
+      document.removeEventListener("mouseenter", handleMouseEnter, true);
+      document.removeEventListener("mouseleave", handleMouseLeave, true);
       clearInterval(haloInterval);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, [mousePosition]);
 
-  // Don't render on mobile or if reduced motion is preferred
-  if (typeof window !== 'undefined') {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (prefersReducedMotion || isMobile) return null;
-  }
+  // completely disable rendering if not enabled
+  if (!enabled) return null;
 
   const getCursorSize = () => {
     switch (cursorType) {
-      case 'hover': return 20;
-      case 'card': return 60;
-      case 'text': return 8;
-      default: return 12;
+      case "hover":
+        return 20;
+      case "card":
+        return 60;
+      case "text":
+        return 8;
+      default:
+        return 12;
     }
   };
 
   const getHaloSize = () => {
     switch (cursorType) {
-      case 'hover': return 60;
-      case 'card': return 120;
-      case 'text': return 30;
-      default: return 40;
+      case "hover":
+        return 60;
+      case "card":
+        return 120;
+      case "text":
+        return 30;
+      default:
+        return 40;
     }
   };
 
@@ -97,9 +131,12 @@ export const CustomCursor = () => {
         }}
         animate={{
           scale: isHovering ? 1.5 : 1,
-          backgroundColor: cursorType === 'card' ? 'hsl(var(--stellar-purple))' : 'hsl(var(--primary))',
+          backgroundColor:
+            cursorType === "card"
+              ? "hsl(var(--stellar-purple))"
+              : "hsl(var(--primary))",
         }}
-        transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+        transition={{ type: "spring", stiffness: 500, damping: 28 }}
       />
 
       {/* Cursor halo */}
@@ -113,13 +150,16 @@ export const CustomCursor = () => {
         }}
         animate={{
           scale: isHovering ? 1.2 : 1,
-          borderColor: cursorType === 'card' ? 'hsl(var(--stellar-cyan) / 0.5)' : 'hsl(var(--primary) / 0.3)',
+          borderColor:
+            cursorType === "card"
+              ? "hsl(var(--stellar-cyan) / 0.5)"
+              : "hsl(var(--primary) / 0.3)",
         }}
-        transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+        transition={{ type: "spring", stiffness: 150, damping: 15 }}
       />
 
-      {/* Ripple effect for special interactions */}
-      {cursorType === 'card' && (
+      {/* Ripple effect */}
+      {cursorType === "card" && (
         <motion.div
           className="fixed pointer-events-none z-[9997] rounded-full bg-gradient-stellar opacity-20"
           style={{

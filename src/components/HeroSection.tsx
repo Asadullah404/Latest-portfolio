@@ -1,14 +1,9 @@
 import { motion } from 'framer-motion';
-import { ArrowDown, Github, Linkedin, Mail, Phone } from 'lucide-react';
+import { Github, Linkedin, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ParticleBackground } from './ParticleBackground';
 
 export const HeroSection = () => {
-  const scrollToNext = () => {
-    const nextSection = document.getElementById('about');
-    nextSection?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
@@ -21,6 +16,7 @@ export const HeroSection = () => {
 
       {/* Main Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
+        {/* Logo / Picture */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,12 +29,15 @@ export const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.5, type: "spring", stiffness: 200 }}
             className="inline-block p-4 rounded-full glass glow mb-8"
           >
-            <div className="w-32 h-32 rounded-full bg-gradient-stellar flex items-center justify-center text-6xl font-bold text-primary-foreground">
-              AS
-            </div>
+            <img
+              src="/face.png"
+              alt="Muhammad Asadullah Sohail"
+              className="w-32 h-32 rounded-full object-cover shadow-lg"
+            />
           </motion.div>
         </motion.div>
 
+        {/* Name */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -50,6 +49,7 @@ export const HeroSection = () => {
           <span className="text-foreground">Sohail</span>
         </motion.h1>
 
+        {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -59,6 +59,7 @@ export const HeroSection = () => {
           Computer Science Student & Developer
         </motion.p>
 
+        {/* Short Bio */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -109,15 +110,15 @@ export const HeroSection = () => {
         >
           {[
             { icon: Mail, href: 'mailto:muhammad.asadullah.suhail@gmail.com', label: 'Email' },
-            { icon: Linkedin, href: 'https://linkedin.com/in/muhammad-asadullah-b97271364', label: 'LinkedIn' },
-            { icon: Github, href: '#', label: 'GitHub' },
-            { icon: Phone, href: 'tel:+923022111051', label: 'Phone' },
+            { icon: Github, href: 'https://github.com/asadullah404', label: 'GitHub' },
+            { icon: Linkedin, href: 'https://www.linkedin.com/in/muhammad-asadullah-b97271364', label: 'LinkedIn' },
+            { icon: Phone, href: 'https://wa.me/923022111051', label: 'WhatsApp' },
           ].map((social, index) => (
             <motion.a
               key={social.label}
               href={social.href}
-              target={social.href.startsWith('http') ? '_blank' : undefined}
-              rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
               className="p-4 rounded-full glass glow hover:bg-primary/10 transition-all duration-300 group interactive"
               whileHover={{ scale: 1.1, y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -130,18 +131,6 @@ export const HeroSection = () => {
             </motion.a>
           ))}
         </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.button
-          onClick={scrollToNext}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 p-3 rounded-full glass glow interactive group"
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <ArrowDown className="w-6 h-6 group-hover:text-primary transition-colors" />
-        </motion.button>
       </div>
 
       {/* Gradient Overlays */}
