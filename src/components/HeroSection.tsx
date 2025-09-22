@@ -56,7 +56,7 @@ export const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-xl md:text-2xl text-muted-foreground mb-2 font-medium"
         >
-          Computer Science Student & Developer
+          Computer Science Graduate & Developer
         </motion.p>
 
         {/* Short Bio */}
