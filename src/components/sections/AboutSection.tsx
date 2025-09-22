@@ -5,8 +5,9 @@ export const AboutSection = () => {
   const achievements = [
     {
       icon: Code,
-      title: "Full-Stack Developer",
-      description: "Proficient in modern web technologies including React.js, JavaScript, and Python"
+      title: "Frontend Developer",
+      description: "Proficient in modern web technologies including React.js, JavaScript, Python, and full-stack development with Firebase"
+
     },
     {
       icon: Cpu,
@@ -43,7 +44,7 @@ export const AboutSection = () => {
             <span className="gradient-text">About</span> Me
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            I'm a passionate Computer Science student with a drive for innovation and excellence. 
+            I'm a passionate Computer Science Graduate with a drive for innovation and excellence. 
             My journey in technology spans from low-level hardware programming to modern web development, 
             always seeking to bridge the gap between imagination and reality.
           </p>
