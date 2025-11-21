@@ -111,7 +111,7 @@ export const HeroSection = () => {
           {[
             { icon: Mail, href: 'mailto:muhammad.asadullah.suhail@gmail.com', label: 'Email' },
             { icon: Github, href: 'https://github.com/asadullah404', label: 'GitHub' },
-            { icon: Linkedin, href: 'https://www.linkedin.com/in/muhammad-asadullah-b97271364', label: 'LinkedIn' },
+            { icon: Linkedin, href: 'https://www.linkedin.com/in/muhammad-asadullah-sohail-9738b1396', label: 'LinkedIn' },
             { icon: Phone, href: 'https://wa.me/923022111051', label: 'WhatsApp' },
           ].map((social, index) => (
             <motion.a
