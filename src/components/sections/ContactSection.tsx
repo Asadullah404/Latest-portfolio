@@ -36,7 +36,7 @@ export const ContactSection = () => {
       icon: Linkedin,
       label: "LinkedIn",
       value: "muhammad-asadullah",
-      href: "https://linkedin.com/in/muhammad-asadullah-b97271364",
+      href: "https://linkedin.com/in/muhammad-asadullah-sohail-9738b1396",
       color: "stellar-cyan",
     },
     {
