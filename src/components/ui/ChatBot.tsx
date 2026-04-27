@@ -35,7 +35,7 @@ export const ChatBot = () => {
     if (!txt) return;
 
     setInput("");
-    
+
     // Add user message
     const userMsg: Message = { id: Date.now().toString(), text: txt, sender: "user" };
     setMessages((prev) => [...prev, userMsg]);
@@ -49,7 +49,7 @@ Visitor question: "${txt}"`;
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_OPENROUTER_KEY || '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'}`,
+          Authorization: `Bearer ${import.meta.env.VITE_OPENROUTER_KEY}`,
           "Content-Type": "application/json",
           "HTTP-Referer": window.location.href,
           "X-Title": "Muhammad Asadullah Portfolio",
@@ -70,7 +70,7 @@ Visitor question: "${txt}"`;
       // Check if AI decided to trigger an email
       if (aiResponse.includes("[SEND_EMAIL]")) {
         aiResponse = aiResponse.replace("[SEND_EMAIL]", "").trim();
-        
+
         // Trigger email
         try {
           await fetch("https://formspree.io/f/mqazyago", {
@@ -156,17 +156,16 @@ Visitor question: "${txt}"`;
                   className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-2xl p-3 text-sm ${
-                      msg.sender === "user"
-                        ? "bg-primary text-white rounded-tr-sm"
-                        : "bg-secondary text-foreground rounded-tl-sm border border-border"
-                    }`}
+                    className={`max-w-[80%] rounded-2xl p-3 text-sm ${msg.sender === "user"
+                      ? "bg-primary text-white rounded-tr-sm"
+                      : "bg-secondary text-foreground rounded-tl-sm border border-border"
+                      }`}
                   >
                     {msg.text}
                   </div>
                 </div>
               ))}
-              
+
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="bg-secondary text-foreground border border-border rounded-2xl rounded-tl-sm p-3 flex gap-1 items-center">
