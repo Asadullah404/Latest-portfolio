@@ -110,9 +110,9 @@ export const ContactSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="space-y-8"
+            className="h-full"
           >
-            <div className="glass p-8 rounded-2xl hover:shadow-2xl transition-all duration-500">
+            <div className="glass p-8 rounded-2xl hover:shadow-2xl transition-all duration-500 h-full flex flex-col justify-center">
               <h3 className="text-2xl font-bold mb-8 gradient-text">
                 Get in Touch
               </h3>
@@ -137,11 +137,11 @@ export const ContactSection = () => {
                     <div className="p-3 rounded-lg bg-gradient-stellar glow group-hover:rotate-6 transition-transform">
                       <contact.icon className="w-5 h-5 text-primary-foreground" />
                     </div>
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <div className="font-semibold group-hover:text-primary transition-colors">
                         {contact.label}
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-muted-foreground break-all">
                         {contact.value}
                       </div>
                     </div>
@@ -157,10 +157,11 @@ export const ContactSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
+            className="h-full"
           >
             <form
               onSubmit={handleSubmit}
-              className="glass p-8 rounded-2xl space-y-6 hover:shadow-2xl transition-all duration-500"
+              className="glass p-8 rounded-2xl space-y-6 hover:shadow-2xl transition-all duration-500 h-full flex flex-col justify-center"
             >
               <h3 className="text-2xl font-bold mb-6 gradient-text">
                 Send a Message

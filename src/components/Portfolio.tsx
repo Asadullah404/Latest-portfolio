@@ -8,15 +8,17 @@ import { AboutSection } from './sections/AboutSection';
 import { SkillsSection } from './sections/SkillsSection';
 import { ProjectsSection } from './sections/ProjectsSection';
 import { ContactSection } from './sections/ContactSection';
+import { ChatBot } from './ui/ChatBot';
 
 export const Portfolio = () => {
   // const [currentChapter, setCurrentChapter] = useState<number | null>(null);
   // const [showChapterReveal, setShowChapterReveal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-clip">
       <CustomCursor />
       <ThemeSwitcher />
+      <ChatBot />
 
       {/* 🚫 ChapterReveal disabled for now */}
       {/* 
