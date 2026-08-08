@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { CustomCursor } from './CustomCursor';
-import { ThemeSwitcher } from './ThemeSwitcher';
 import { HeroSection } from './HeroSection';
 import { AboutSection } from './sections/AboutSection';
 import { SkillsSection } from './sections/SkillsSection';
@@ -13,7 +12,6 @@ export const Portfolio = () => {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-clip relative">
       <CustomCursor />
-      <ThemeSwitcher />
       <ChatBot />
 
       {/* ─── AI Animated Artwork Background + Tear Down Scroll Effect ────────── */}

@@ -337,7 +337,8 @@ export const ProjectsSection = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [viewMode, setViewMode] = useState<"carousel" | "grid">("carousel");
   const [selectedModalProject, setSelectedModalProject] = useState<ProjectItem | null>(null);
-  const [mediaIndex, setMediaIndex] = useState<{ [key: number]: number }>({});
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const categories = ["All", "Full-Stack", "IoT & Hardware", "AI & Automation", "Web & Software Services"];
 
@@ -385,11 +386,34 @@ export const ProjectsSection = () => {
     const sectionTop = rect.top + scrollTop;
     const sectionHeight = rect.height;
     const targetScroll = sectionTop + (idx / Math.max(TOTAL - 1, 1)) * (sectionHeight - window.innerHeight);
-    
+
     try {
       window.scrollTo({ top: targetScroll, behavior: "smooth" });
     } catch (e) {
       window.scrollTo(0, targetScroll);
+    }
+  };
+
+  /* Touch swipe handlers for mobile navigation */
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && activeIndex < TOTAL - 1) {
+      navigateTo(activeIndex + 1);
+    } else if (isRightSwipe && activeIndex > 0) {
+      navigateTo(activeIndex - 1);
     }
   };
 
@@ -402,7 +426,7 @@ export const ProjectsSection = () => {
       style={{ height: viewMode === "carousel" ? `${Math.max(TOTAL, 1) * 70 + 80}vh` : "auto" }}
     >
       {/* Sticky viewport for 3D Carousel */}
-      <div className={`${viewMode === "carousel" ? "projects-sticky-view sticky top-0" : "py-20"} min-h-screen flex flex-col justify-between overflow-hidden`}>
+      <div className={`${viewMode === "carousel" ? "projects-sticky-view sticky top-0" : "py-12 md:py-20"} min-h-screen flex flex-col justify-between overflow-hidden`}>
         
         {/* Atmosphere glowing background */}
         <div className="projects-atmosphere pointer-events-none">
@@ -422,71 +446,73 @@ export const ProjectsSection = () => {
         </div>
 
         {/* Section Header */}
-        <div className="relative z-20 max-w-7xl mx-auto px-6 pt-10 text-center">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-6 md:pt-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold tracking-wider text-primary mb-4 uppercase glow">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-[11px] sm:text-xs font-semibold tracking-wider text-primary mb-3 uppercase glow">
               <Sparkles size={14} className="animate-spin" />
               Flagship 3D Showcase ({projects.length} Repositories)
             </div>
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-3">
               Featured <span className="gradient-text">Projects & Innovations</span>
             </h2>
-            <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto mb-8">
-              Explore my top creations built across Full-Stack Web Development, AI Pipelines, Computer Vision, and IoT Hardware. Hover cards for 3D spatial rotation!
+            <p className="text-muted-foreground text-xs sm:text-sm md:text-base max-w-2xl mx-auto mb-6 px-2">
+              Explore my top creations built across Full-Stack Web Development, AI Pipelines, Computer Vision, and IoT Hardware. Swipe or hover cards for 3D spatial tilt!
             </p>
 
             {/* View Mode & Filter Controls */}
-            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-              {/* Category Filter Pills */}
-              <div className="flex flex-wrap justify-center gap-2 bg-secondary/30 p-1.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-xl">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => {
-                      setSelectedCategory(cat);
-                      setActiveIndex(0);
-                    }}
-                    className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all duration-300 ${
-                      selectedCategory === cat
-                        ? "bg-primary text-primary-foreground shadow-lg glow scale-105"
-                        : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 mb-4 sm:mb-6">
+              {/* Category Filter Pills (Scrollable on small mobile) */}
+              <div className="max-w-full overflow-x-auto no-scrollbar py-1">
+                <div className="flex items-center gap-1.5 bg-secondary/30 p-1.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-xl whitespace-nowrap">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setSelectedCategory(cat);
+                        setActiveIndex(0);
+                      }}
+                      className={`px-3 sm:px-4 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold transition-all duration-300 ${
+                        selectedCategory === cat
+                          ? "bg-primary text-primary-foreground shadow-lg glow scale-105"
+                          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* View Switcher Toggle */}
               <div className="flex items-center gap-1 bg-secondary/30 p-1.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-xl">
                 <button
                   onClick={() => setViewMode("carousel")}
-                  className={`p-2 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all ${
                     viewMode === "carousel"
-                      ? "bg-primary text-primary-foreground shadow-md"
+                      ? "bg-primary text-primary-foreground shadow-md font-bold"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                   title="3D Wheel View"
                 >
                   <RotateCw size={14} />
-                  <span className="hidden sm:inline">3D Stage</span>
+                  <span>3D Stage</span>
                 </button>
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all ${
                     viewMode === "grid"
-                      ? "bg-primary text-primary-foreground shadow-md"
+                      ? "bg-primary text-primary-foreground shadow-md font-bold"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
-                  title="Grid View"
+                  title="3D Grid View"
                 >
                   <Grid size={14} />
-                  <span className="hidden sm:inline">3D Grid</span>
+                  <span>3D Grid</span>
                 </button>
               </div>
             </div>
@@ -495,7 +521,12 @@ export const ProjectsSection = () => {
 
         {/* ── MODE 1: 3D CAROUSEL STAGE ────────────────────────────── */}
         {viewMode === "carousel" && (
-          <div className="carousel-stage relative flex-1 flex items-center justify-center my-6">
+          <div
+            className="carousel-stage relative flex-1 flex items-center justify-center my-4 sm:my-6 touch-pan-y"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             <div className="carousel-wheel-wrapper">
               <motion.div
                 className="carousel-wheel"
@@ -529,47 +560,47 @@ export const ProjectsSection = () => {
                           />
 
                           {/* Media Preview Header */}
-                          <div className="relative h-48 overflow-hidden bg-black/40">
+                          <div className="relative h-40 sm:h-48 overflow-hidden bg-black/40">
                             <img src={project.media[0].src} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
 
                             {/* Badge tag */}
-                            <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-bold tracking-wide uppercase" style={{ color: project.color }}>
+                            <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-white/10 text-[9px] sm:text-[10px] font-bold tracking-wide uppercase" style={{ color: project.color }}>
                               {project.badgeTag}
                             </div>
 
-                            <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded bg-black/70 border border-white/10" style={{ color: project.color }}>
+                            <div className="absolute top-2.5 right-2.5 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded bg-black/80 border border-white/10" style={{ color: project.color }}>
                               #{String(index + 1).padStart(2, "0")}
                             </div>
                           </div>
 
                           {/* Card Body */}
-                          <div className="p-6 flex flex-col justify-between flex-1">
+                          <div className="p-4 sm:p-6 flex flex-col justify-between flex-1">
                             <div>
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-semibold flex items-center gap-1" style={{ color: project.color }}>
+                                <span className="text-[11px] sm:text-xs font-semibold flex items-center gap-1" style={{ color: project.color }}>
                                   <Icon size={12} /> {project.category}
                                 </span>
-                                <span className="text-xs text-muted-foreground font-mono">{project.year}</span>
+                                <span className="text-[10px] sm:text-xs text-muted-foreground font-mono">{project.year}</span>
                               </div>
 
-                              <h3 className="text-xl font-extrabold mb-2 group-hover:text-primary transition-colors">
+                              <h3 className="text-lg sm:text-xl font-extrabold mb-1.5 sm:mb-2 group-hover:text-primary transition-colors">
                                 {project.title}
                               </h3>
 
-                              <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed mb-4">
+                              <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed mb-3 sm:mb-4">
                                 {project.description}
                               </p>
 
                               {/* Tech Stack Pills */}
-                              <div className="flex flex-wrap gap-1.5 mb-4">
+                              <div className="flex flex-wrap gap-1 mb-3 sm:mb-4">
                                 {project.tech.slice(0, 3).map((t) => (
-                                  <span key={t} className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-foreground/80 font-mono">
+                                  <span key={t} className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-foreground/80 font-mono">
                                     {t}
                                   </span>
                                 ))}
                                 {project.tech.length > 3 && (
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-muted-foreground font-mono">
+                                  <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-muted-foreground font-mono">
                                     +{project.tech.length - 3}
                                   </span>
                                 )}
@@ -627,9 +658,9 @@ export const ProjectsSection = () => {
           </div>
         )}
 
-        {/* ── MODE 2: INTERACTIVE 3D GRID VIEW ────────────────────────────── */}
+        {/* ── MODE 2: INTERACTIVE 3D GRID VIEW (MOBILE FULLY RESPONSIVE) ────────── */}
         {viewMode === "grid" && (
-          <div className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 relative z-20">
             {filteredProjects.map((project, index) => {
               const Icon = project.icon;
               return (
@@ -637,31 +668,49 @@ export const ProjectsSection = () => {
                   key={project.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  transition={{ duration: 0.5, delay: index * 0.04 }}
                   viewport={{ once: true }}
+                  className="relative group"
                 >
+                  {/* Interconnected Node Vector Lines between grid items */}
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full z-30 shadow-[0_0_10px_currentColor]"
+                    style={{ color: project.color, backgroundColor: project.color }}
+                  />
+                  <div
+                    className="absolute -top-3 left-0 right-0 h-0.5 opacity-30 bg-gradient-to-r from-transparent via-current to-transparent pointer-events-none"
+                    style={{ color: project.color }}
+                  />
+
                   <Tilt3DCard glowColor={project.glow}>
                     <div
-                      className="glass rounded-2xl overflow-hidden border border-white/10 flex flex-col justify-between group hover:border-primary/50 transition-all duration-300 shadow-xl"
+                      className="glass rounded-2xl overflow-hidden border border-white/10 flex flex-col justify-between group hover:border-primary/50 transition-all duration-300 shadow-xl h-full"
                     >
-                      <div className="relative h-48 overflow-hidden bg-black/40">
+                      {/* Top Accent Line */}
+                      <div
+                        className="h-1 w-full"
+                        style={{ background: `linear-gradient(90deg, ${project.color}, transparent)` }}
+                      />
+
+                      <div className="relative h-44 sm:h-48 overflow-hidden bg-black/40">
                         <img src={project.media[0].src} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase" style={{ color: project.color }}>
+                        
+                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-wider" style={{ color: project.color }}>
                           {project.badgeTag}
                         </div>
-                        <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded bg-black/60 border border-white/10" style={{ color: project.color }}>
+                        <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded bg-black/80 border border-white/10 font-mono" style={{ color: project.color }}>
                           {project.year}
                         </div>
                       </div>
 
-                      <div className="p-6 flex-1 flex flex-col justify-between">
+                      <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
                         <div>
-                          <div className="flex items-center gap-1.5 text-xs font-medium mb-2" style={{ color: project.color }}>
+                          <div className="flex items-center gap-1.5 text-xs font-semibold mb-2" style={{ color: project.color }}>
                             <Icon size={14} /> {project.category}
                           </div>
 
-                          <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                          <h3 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                             {project.title}
                           </h3>
 
@@ -671,7 +720,7 @@ export const ProjectsSection = () => {
 
                           <div className="flex flex-wrap gap-1.5 mb-6">
                             {project.tech.map((t) => (
-                              <span key={t} className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 font-mono">
+                              <span key={t} className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 font-mono text-foreground/80">
                                 {t}
                               </span>
                             ))}
@@ -684,10 +733,10 @@ export const ProjectsSection = () => {
                               href={project.demo}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-white transition-all hover:brightness-110"
+                              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:brightness-110 shadow-lg"
                               style={{ background: project.color }}
                             >
-                              <ExternalLink size={12} /> Demo
+                              <ExternalLink size={13} /> Demo
                             </a>
                           )}
                           {project.github && (
@@ -695,15 +744,15 @@ export const ProjectsSection = () => {
                               href={project.github}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-muted-foreground hover:text-foreground transition-all"
+                              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-muted-foreground hover:text-foreground transition-all"
                               title="GitHub Source"
                             >
-                              <Github size={14} />
+                              <Github size={15} />
                             </a>
                           )}
                           <button
                             onClick={() => setSelectedModalProject(project)}
-                            className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all"
+                            className="px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all"
                           >
                             Details
                           </button>
@@ -719,20 +768,20 @@ export const ProjectsSection = () => {
 
         {/* Bottom Carousel Navigation Controls */}
         {viewMode === "carousel" && (
-          <div className="relative z-20 pb-8 flex flex-col items-center gap-4">
+          <div className="relative z-20 pb-6 sm:pb-8 flex flex-col items-center gap-3 sm:gap-4">
             <div className="text-center text-xs font-semibold tracking-wider" style={{ color: activeProject.color }}>
               <span className="opacity-60">{String(activeIndex + 1).padStart(2, "0")} / {String(TOTAL).padStart(2, "0")}</span>
               <span className="mx-2">•</span>
               <span>{activeProject.title}</span>
             </div>
 
-            <div className="flex flex-wrap justify-center items-center gap-2 max-w-xl px-4">
+            <div className="flex flex-wrap justify-center items-center gap-1.5 sm:gap-2 max-w-xl px-4">
               {filteredProjects.map((p, i) => (
                 <button
                   key={p.id}
                   onClick={() => navigateTo(i)}
                   className={`h-2 rounded-full transition-all duration-300 ${
-                    i === activeIndex ? "w-8" : "w-2 opacity-40 hover:opacity-100"
+                    i === activeIndex ? "w-6 sm:w-8" : "w-2 opacity-40 hover:opacity-100"
                   }`}
                   style={{
                     background: p.color,
